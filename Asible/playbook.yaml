@@ -1,0 +1,27 @@
+---
+- name: Download file with authentication
+  hosts: app_host
+  gather_facts: no
+  vars:
+    url: "https://edelivery.oracle.com/akam/otn/mysql/ee/mysql-enterprise-9.1.0_el9_x86_64_bundle.tar"  # Replace with the actual file URL
+    username: "mrbuzzi91@gmail.com"                      # Replace with your username
+    password: "P@ssword1234"                      # Replace with your password
+    dest: "/var/ansible_test/source_fold/mysql-enterprise-9.1.0_el9_x86_64_bundle.tar"             # Desired local file path
+
+  tasks:
+    - name: Download the file
+      uri:
+        url: "{{ url }}"
+        method: GET
+        user: "{{ username }}"
+        password: "{{ password }}"
+        force_basic_auth: yes
+        return_content: yes
+        status_code: 200
+      register: download_response
+
+    - name: Save the downloaded file
+      copy:
+        content: "{{ download_response.content }}"
+        dest: "{{ dest }}"
+      when: download_response.status == 200
